@@ -12,5 +12,5 @@ class UserSerializer(serializers.ModelSerializer):
     # instead of plain text password
     # this method is called when we call serializer.save()
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
+        user = User.objects.create_user(**validated_data) 
         return user # return the user object
