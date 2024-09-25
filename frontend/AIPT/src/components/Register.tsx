@@ -14,17 +14,14 @@ const Register: React.FC = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/api/auth/register', { name, email, password, role });
-      
-      // Store token and role in localStorage
+
+      alert(response.data.message);
+      console.log(response.data);
+    
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('role', response.data.role); // Store the user role
+      localStorage.setItem('role', response.data.role); 
       
-      // Redirect based on the role
-      if (response.data.role === 'interviewer') {
-        navigate('/interviewer-home');
-      } else if (response.data.role === 'candidate') {
-        navigate('/candidate-home');
-      }
+      navigate('/login');
     } catch (error) {
       console.error(error);
     }
