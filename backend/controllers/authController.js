@@ -3,9 +3,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Register User
-exports.register = async (req, res) => {
-  const { name, email, password } = req.body;
+const register = async (req, res) => {
+  const { name, email, password, role } = req.body;
   try {
+    
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ msg: 'User already exists' });
@@ -14,28 +15,37 @@ exports.register = async (req, res) => {
     user = new User({
       name,
       email,
-      password
+      password,
+      role,  
     });
 
     // Hash Password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
-
     await user.save();
 
+    // Payload for JWT
     const payload = {
       user: {
-        id: user.id
-      }
+        id: user.id,
+        role: user.role, 
+      },
     };
 
+    // Generate JWT Token
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: 360000 },
+      { expiresIn: 360000 },  
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+
+        // Send back token and the user role in the response
+        res.json({
+          token,
+          role: user.role, // Send role for the frontend to handle redirection
+          msg: 'User registered successfully',
+        });
       }
     );
   } catch (err) {
@@ -43,38 +53,34 @@ exports.register = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+
+
+
 
 // Login User
-exports.login = async (req, res) => {
+
+
+
+const login = async (req, res) => {
   const { email, password } = req.body;
-  try {
-    let user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ msg: 'Invalid Credentials' });
-    }
+  
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid Credentials' });
-    }
-
-    const payload = {
-      user: {
-        id: user.id
-      }
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: 360000 },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: 'User not found' });
+  
+  // Check if password is correct
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+  
+  // Generate a JWT token
+  const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  
+  // Send back token and user role (interviewer or candidate)
+  res.json({
+    token,
+    role: user.role  
+  });
 };
+
+module.exports = { login , register };
