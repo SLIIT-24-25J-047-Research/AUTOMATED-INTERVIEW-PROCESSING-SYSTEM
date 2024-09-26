@@ -9,6 +9,7 @@ const Register: React.FC = () => {
   const [role, setRole] = useState('candidate'); // Default is 'candidate'
   const [name, setName] = useState('');
 
+
   const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
