@@ -10,25 +10,16 @@ const Register: React.FC = () => {
   const [name, setName] = useState('');
 
   const navigate = useNavigate();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/api/auth/register', { name, email, password, role });
-
       alert(response.data.message);
       console.log(response.data);
-    
-
-      alert(response.data.message);
-      console.log(response.data);
-    
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('role', response.data.role); 
-      localStorage.setItem('role', response.data.role); 
-      
       navigate('/login');
-      navigate('/login');
+ 
     } catch (error) {
       console.error(error);
     }
