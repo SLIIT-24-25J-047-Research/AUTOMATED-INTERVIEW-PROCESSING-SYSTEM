@@ -4,62 +4,43 @@ const jwt = require('jsonwebtoken');
 
 // Register User
 const register = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { email, password, role, name } = req.body;
+
   try {
-    
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ msg: 'User already exists' });
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
     }
 
-    user = new User({
-      name,
+    // Create new user (hashing is done automatically in the User schema)
+    const newUser = new User({
       email,
-      password,
-      role,  
+      password, // No need to hash here, it's handled in the schema
+      role,
+      name
     });
 
-    // Hash Password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-    await user.save();
+    await newUser.save();
 
-    // Payload for JWT
-    const payload = {
-      user: {
-        id: user.id,
-        role: user.role, 
-      },
-    };
-
-    // Generate JWT Token
-    jwt.sign(
-      payload,
+    // Generate JWT token after successful registration
+    const token = jwt.sign(
+      { id: newUser._id, role: newUser.role },
       process.env.JWT_SECRET,
-      { expiresIn: 360000 },  
-      (err, token) => {
-        if (err) throw err;
-
-        // Send back token and the user role in the response
-        res.json({
-          token,
-          role: user.role, // Send role for the frontend to handle redirection
-          msg: 'User registered successfully',
-        });
-      }
+      { expiresIn: '1h' }
     );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+
+    // Return the token and user role
+    res.status(201).json({
+      token,
+      role: newUser.role
+    });
+
+  } catch (error) {
+    console.error('Error during registration:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
-
-
-
-
-
-
-
 
 
 // Login User
@@ -97,10 +78,6 @@ const login = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-
-
-
 //---
 
 module.exports = { login , register };
