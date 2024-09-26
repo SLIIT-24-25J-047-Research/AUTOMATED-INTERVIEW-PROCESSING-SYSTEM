@@ -8,8 +8,7 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('candidate'); // Default is 'candidate'
   const [name, setName] = useState('');
-  const [role, setRole] = useState('candidate'); // Default is 'candidate'
-  const [name, setName] = useState('');
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,9 +19,15 @@ const Register: React.FC = () => {
       alert(response.data.message);
       console.log(response.data);
     
+
+      alert(response.data.message);
+      console.log(response.data);
+    
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('role', response.data.role); 
+      localStorage.setItem('role', response.data.role); 
       
+      navigate('/login');
       navigate('/login');
     } catch (error) {
       console.error(error);
