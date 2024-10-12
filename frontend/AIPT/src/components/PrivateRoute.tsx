@@ -3,13 +3,15 @@ import { Navigate } from 'react-router-dom';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
+  allowedRoles: string[];  // Add a prop for allowed roles
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const token = localStorage.getItem('token');  // Check if a token exists
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
+  const token = localStorage.getItem('token');   
+  const role = localStorage.getItem('role');     
 
-  // If token doesn't exist, redirect to the login page
-  return token ? <>{children}</> : <Navigate to="/login" />;
+  const isAuthenticated = !!token && allowedRoles.includes(role || '');
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 export default PrivateRoute;

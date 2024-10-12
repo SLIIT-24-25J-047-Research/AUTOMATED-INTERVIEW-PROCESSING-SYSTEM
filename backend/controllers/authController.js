@@ -48,17 +48,25 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    console.log('Checking for user with email:', email);
+
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      console.log('User not found');
+      return res.status(404).json({ message: 'User not found' }); // Added return to stop further execution
     }
+
+    console.log('User found:');
 
     // Check if password matches
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      console.log('Password mismatch');
+      return res.status(400).json({ message: 'Invalid credentials' }); // Added return to stop further execution
     }
+
+    console.log('Password match, generating token');
 
     // Generate JWT token
     const token = jwt.sign(
@@ -67,46 +75,15 @@ const login = async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    // Return the token and the user's role
-    res.json({
+    // Send back the token and user role
+    return res.json({
       token,
       role: user.role
-    });
+    }); // Ensure this is the last response
 
   } catch (error) {
     console.error('Error during login:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-
-  try {
-    // Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Check if password matches
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    // Return the token and the user's role
-    res.json({
-      token,
-      role: user.role
-    });
-
-  } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' }); // Added return to stop further execution
   }
 };
 //---
