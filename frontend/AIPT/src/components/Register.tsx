@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../Auth.css';
+import image from '../images/registerBG.jpg';
 
 const Register: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -27,49 +28,56 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="auth-container">
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <h2>Register</h2>
-        <input 
-          type="text" 
-          placeholder="Name" 
-          value={name} 
-          onChange={(e) => setName(e.target.value)} 
-        />
-        <input 
-          type="email" 
-          placeholder="Email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-        />
-        <input 
-          type="password" 
-          placeholder="Password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-        />
-        
-        <label>
-          <input
-            type="radio"
-            value="candidate"
-            checked={role === 'candidate'}
-            onChange={() => setRole('candidate')}
-          />
-          Candidate
-        </label>
-        <label>
-          <input
-            type="radio"
-            value="interviewer"
-            checked={role === 'interviewer'}
-            onChange={() => setRole('interviewer')}
-          />
-          Interviewer
-        </label>
-
-        <button type="submit">Register</button>
-      </form>
+    <div className="auth-container2">
+      <div className="auth-box">
+        <div className="auth-image">
+          <img src={image} alt="Register Illustration" />
+        </div>
+        <div className="auth-form-wrapper">
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <h2>Register</h2>
+            <input 
+              type="text" 
+              placeholder="Name" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+            />
+            <input 
+              type="email" 
+              placeholder="Email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+            />
+            <input 
+              type="password" 
+              placeholder="Password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+            />
+            <div className="radio-group">
+              <label>
+                <input
+                  type="radio"
+                  value="candidate"
+                  checked={role === 'candidate'}
+                  onChange={() => setRole('candidate')}
+                />
+                Candidate
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="interviewer"
+                  checked={role === 'interviewer'}
+                  onChange={() => setRole('interviewer')}
+                />
+                Interviewer
+              </label>
+            </div>
+            <button type="submit">Register</button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
